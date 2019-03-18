@@ -1,0 +1,59 @@
+layer1 neuron
+calculating avg rate:
+31.99
+63.98
+0.0312597686777
+layer1 neuron
+calculating avg rate:
+6.4
+12.8
+0.15625
+layer2 neuron
+calculating avg rate:
+8.8
+17.6
+0.113636363636
+layer2 neuron
+calculating avg rate:
+9.59
+19.18
+0.104275286757
+layer2 neuron
+calculating avg rate:
+7.24
+14.48
+0.138121546961
+layer2 neuron
+calculating avg rate:
+23.57
+47.14
+0.0424268137463
+layer2 neuron
+calculating avg rate:
+5.58
+11.16
+0.179211469534
+layer2 neuron
+calculating avg rate:
+31.5
+63.0
+0.031746031746
+layer2 neuron
+calculating avg rate:
+77.38
+154.76
+0.0129232359783
+layer2 neuron
+calculating avg rate:
+7.96
+15.92
+0.125628140704
+layer3 neuron
+calculating avg rate:
+0.01
+0.02
+100.0
+layer3 neuron
+0
+case 1 low: 100.0 high: 0
+trained results:
