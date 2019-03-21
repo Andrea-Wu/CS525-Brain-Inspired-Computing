@@ -1,13 +1,13 @@
 from random import random
 
-TRAIN_LOOP = 10
+TRAIN_LOOP = 1000
 
-TIME_PER_NEURON = 1 #time is a social construct. We don't need units!
-LOW_CURR = 1e-3
-HIGH_CURR = 5e-3
+TIME_PER_NEURON = 10 #time is a social construct. We don't need units!
+LOW_CURR = 1e-4
+HIGH_CURR = 5e-4
 
 ON_TRAIN = 10
-OFF_TRAIN = -10
+OFF_TRAIN = -1
 
 CTR = 1
 class TrainingNeuron:
@@ -84,7 +84,7 @@ class Neuron:
 
             #perform oja's rule
             #constants:
-            L_R = 1e-4 #LEARNING_RATE
+            L_R = 1e-3 #LEARNING_RATE
 
             #get avg rate of curr neuron and avg rate of prev neuron
             v_i = self.avgRate #Current (post-synaptic)
@@ -101,7 +101,7 @@ class Neuron:
         self.calculateAvgRate()
         self.updateWeights()
         self.time += TIME_PER_NEURON
-        print(self.avgRate)
+        print("average rate: " + str(self.avgRate))
 
 
     def performWeightedSum(self):
@@ -135,6 +135,9 @@ class Synapse:
         self.pre = pre
         self.post = post
         self.weight = random()
+        neg  = random()
+        if neg < 0.5:
+            self.weight *= -1
 
 
 def fullyConnect(arr1, arr2):
@@ -192,9 +195,9 @@ def main():
     #LAYER3        
     #create training neurons
     trainLow = TrainingNeuron(None)
-    trainLow.updateCurrent(5e-2)
+    trainLow.updateCurrent(5e-4)
     trainHigh = TrainingNeuron(None)
-    trainHigh.updateCurrent(5e-2)
+    trainHigh.updateCurrent(5e-4)
 
     #create training synapses
     synLow = Synapse(trainLow, layer3[0])
@@ -209,7 +212,11 @@ def main():
     for i in range(TRAIN_LOOP):
         runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, case=1, ctr=CTR)
         runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, case=3, ctr=CTR)
-
+    """
+    for i in range(TRAIN_LOOP):
+        #runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, case=1, ctr=CTR)
+        runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, case=3, ctr=CTR)
+    """
 
 
     #pop the training neurons and see if the net stil works (assuming last on list)
@@ -220,7 +227,7 @@ def main():
     #neural net time without training neurons!
     print("case 1")
     runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, case=1, ctr=1)
-    print("case 2")
+    print("case 3")
     runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, case=3, ctr=1)
 
 
