@@ -13,8 +13,8 @@ HIGH_CURR = 5e-3
 ON_TRAIN = 1
 OFF_TRAIN = -100
 
-CASE1_RATE = -1
-CASE3_RATE = -1
+
+case_rates = {}
 
 negativeWeightCtr = 0
 
@@ -189,8 +189,7 @@ def makeSynapsesNegative(neur):
 
 
 def main():
-    global CASE1_RATE
-    global CASE3_RATE
+    global case_rates
 
     layer1 = []
     layer2 = []
@@ -250,11 +249,9 @@ def main():
     trainLow = TrainingNeuron(None)
     trainHigh = TrainingNeuron(None)
 
-    CASE1_RATE = currToRate(6.4e-5)
-    CASE3_RATE = currToRate(6.4e-5)
+    for lol in range(1,5):
+        case_rates[lol] = currToRate(6.4e-5)
 
-    print("R1: " + str(CASE1_RATE))
-    print("R3: " + str(CASE3_RATE))
 
     #create training synapses
     synLow = Synapse(trainLow, layer3[0])
@@ -289,8 +286,7 @@ def main():
 def runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow, trainHigh, case, ctr):
    #TODO maybe my input weights aren't different enough? experiment
 
-    global CASE1_RATE
-    global CASE3_RATE
+    global case_rates
     
     if case == 1:
         #A = 1, B = 1
@@ -298,23 +294,25 @@ def runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow, tr
         trainB.updateCurrent(HIGH_CURR)
         synLow.weight = ON_TRAIN
         synHigh.weight = OFF_TRAIN
-        trainHigh.updateCurrWithRate(CASE1_RATE)
-        trainLow.updateCurrWithRate(CASE1_RATE)
+        trainHigh.updateCurrWithRate(case_rates[1])
+        trainLow.updateCurrWithRate(case_rates[1])
         print("ASS: " + str(trainHigh.curr))
     elif case == 2:
         #A = 1, B = 0
         trainA.updateCurrent(HIGH_CURR)
         trainB.updateCurrent(LOW_CURR)
         synLow.weight = OFF_TRAIN
-        synHigh.weight = ON_TRAIN
+        synHigh.weight = ON_TRAIN 
+        trainHigh.updateCurrWithRate(case_rates[2])
+        trainLow.updateCurrWithRate(case_rates[2])
     elif case == 3:
         #A = 0, B = 1
         trainA.updateCurrent(LOW_CURR)
         trainB.updateCurrent(HIGH_CURR)
         synLow.weight = OFF_TRAIN
         synHigh.weight = ON_TRAIN
-        trainHigh.updateCurrWithRate(CASE3_RATE)
-        trainLow.updateCurrWithRate(CASE3_RATE)
+        trainHigh.updateCurrWithRate(case_rates[3])
+        trainLow.updateCurrWithRate(case_rates[3])
         print("HOLE: " + str(trainHigh.curr))
     else:
         #A = 0, B = 0
@@ -322,7 +320,9 @@ def runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow, tr
         trainB.updateCurrent(LOW_CURR)
         synLow.weight =  ON_TRAIN
         synHigh.weight = OFF_TRAIN
-
+        trainHigh.updateCurrWithRate(case_rates[4])
+        trainLow.updateCurrWithRate(case_rates[4])
+    
     for i in range(ctr):
         print("LAYER1")
         for n in layer1:
@@ -345,11 +345,17 @@ def runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow, tr
     
         #update training weights
         if case == 1:
-            CASE1_RATE = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
-            print("CASE1_RATE: " + str(CASE1_RATE))
+            case_rates[1] = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
+            print("CASE1_RATE: " + str(case_rates[1]))
+        elif case == 2:
+            case_rates[2] = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
+            print("CASE3_RATE: " + str(case_rates[2]))
         elif case == 3:
-            CASE3_RATE = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
-            print("CASE3_RATE: " + str(CASE3_RATE))
+            case_rates[3] = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
+            print("CASE3_RATE: " + str(case_rates[3]))
+        elif case == 4:
+            case_rates[4] = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
+            print("CASE3_RATE: " + str(case_rates[4]))
         print("TRAIN_WEIGHT: " + str(trainHigh.curr))
 
     
