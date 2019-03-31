@@ -262,10 +262,10 @@ def main():
     layer3[0].input.append(synAND)
     
     #neural net time with training neurons!
-    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=1,ctr=100)
-    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=2,ctr=100)
-    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=3,ctr=100)
-    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=4,ctr=100)
+    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=1,ctr=400)
+    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=2,ctr=400)
+    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=3,ctr=400)
+    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=4,ctr=400)
     #pop the training neurons and see if the net stil works (assuming last on list)
     for neuron in layer3:
         neuron.input.pop()
