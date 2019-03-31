@@ -10,8 +10,6 @@ LOW_CURR = 2e-3
 HIGH_CURR = 5e-3
 
 
-ON_TRAIN = 1
-OFF_TRAIN = -100
 
 
 case_rates = {}
@@ -201,20 +199,19 @@ def main():
     for i in range(2):
         layer1.append(Neuron())
 
-    #create 8 neurons in the 2nd layer
-    for i in range(8):
+    #create 8 neurons in the 2nd layer. 
+    #layer2[0] will be the OR neuron, layer2[1] will be the NAND
+    for i in range(2):
         layer2.append(Neuron())
 
-    #create 2 neurons in 3rd layer
-    for i in range(2):
+    #create 1 neuron in 3rd layer
+    for i in range(1):
         layer3.append(Neuron())
 
     #fully connect all layers of NN
     fullyConnect(layer1, layer2)
     fullyConnect(layer2, layer3)
 
-    makeSynapsesNegative(layer2[0]) 
-    makeSynapsesNegative(layer2[1])
     print("LAYER 1")
     for neuron in layer1:
         for synapse in neuron.output:
@@ -243,47 +240,43 @@ def main():
     layer1[0].input.append(synA)
     layer1[1].input.append(synB)
 
-            
-    #LAYER3        
-    #create training neurons
-    trainLow = TrainingNeuron(None)
-    trainHigh = TrainingNeuron(None)
+    #LAYER2 train
+    trainNAND = TrainingNeuron(None)
+    trainOR = TrainingNeuron(None)
+    synOR = Synapse(trainOR, layer2[0])
+    synNAND = Synapse(trainNAND, layer2[1])
+    synOR.weight = 1
+    synNAND.weight = 1
+    layer2[0].input.append(synOR)
+    layer2[1].input.append(synNAND)
 
-    for lol in range(1,5):
-        case_rates[lol] = currToRate(6.4e-5)
-
-
-    #create training synapses
-    synLow = Synapse(trainLow, layer3[0])
-    synHigh = Synapse(trainHigh, layer3[1])
-
-    print("TESTING")
-    runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow, trainHigh, case=3, ctr=1)
-
-    #attach synapses to postsynaptic neurons
-    layer3[0].input.append(synLow)
-    layer3[1].input.append(synHigh)
-    
+    #LAYER3 train
+    trainAND = TrainingNeuron(None)
+    synAND = Synapse(trainAND, layer3[0])
+    synAND.weight = 1
+    layer3[0].input.append(synAND)
     
     #neural net time with training neurons!
-    for r in range(3):
-        runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow,trainHigh,case=4,ctr=1)
-        runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow,trainHigh,case=3,ctr=1)
-        runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow,trainHigh,case=2,ctr=1)
-        runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow,trainHigh,case=1,ctr=1)
-    
+    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=1,ctr=100)
+    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=2,ctr=100)
+    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=3,ctr=100)
+    runNet(layer1,layer2,layer3,trainA, trainB, trainNAND,trainOR,trainAND,case=4,ctr=100)
     #pop the training neurons and see if the net stil works (assuming last on list)
     for neuron in layer3:
         neuron.input.pop()
 
     print("TRAINED:")
     #neural net time without training neurons!
-    runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow,trainHigh,case=3,ctr=1)
-    runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow,trainHigh,case=2,ctr=1)
-    runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow,trainHigh,case=1,ctr=1)
-    
+    print("C1")
+    runNet(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=1,ctr=1)
+    print("C2")
+    runNet(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=2,ctr=1)
+    print("C3")
+    runNet(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=3,ctr=1)
+    print("C4")
+    runNet(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=4,ctr=1)
 
-def runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow, trainHigh, case, ctr):
+def runNet(layer1, layer2, layer3, trainA, trainB, trainNAND, trainOR, trainAND, case, ctr):
    #TODO maybe my input weights aren't different enough? experiment
 
     global case_rates
@@ -292,37 +285,30 @@ def runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow, tr
         #A = 1, B = 1
         trainA.updateCurrent(HIGH_CURR)
         trainB.updateCurrent(HIGH_CURR)
-        synLow.weight = ON_TRAIN
-        synHigh.weight = OFF_TRAIN
-        trainHigh.updateCurrWithRate(case_rates[1])
-        trainLow.updateCurrWithRate(case_rates[1])
-        print("ASS: " + str(trainHigh.curr))
+        trainNAND.updateCurrent(LOW_CURR) 
+        trainOR.updateCurrent(HIGH_CURR)
+        trainAND.updateCurrent(LOW_CURR)
     elif case == 2:
         #A = 1, B = 0
         trainA.updateCurrent(HIGH_CURR)
         trainB.updateCurrent(LOW_CURR)
-        synLow.weight = OFF_TRAIN
-        synHigh.weight = ON_TRAIN 
-        trainHigh.updateCurrWithRate(case_rates[2])
-        trainLow.updateCurrWithRate(case_rates[2])
+        trainNAND.updateCurrent(HIGH_CURR) 
+        trainOR.updateCurrent(HIGH_CURR)
+        trainAND.updateCurrent(HIGH_CURR)
     elif case == 3:
         #A = 0, B = 1
         trainA.updateCurrent(LOW_CURR)
         trainB.updateCurrent(HIGH_CURR)
-        synLow.weight = OFF_TRAIN
-        synHigh.weight = ON_TRAIN
-        trainHigh.updateCurrWithRate(case_rates[3])
-        trainLow.updateCurrWithRate(case_rates[3])
-        print("HOLE: " + str(trainHigh.curr))
+        trainNAND.updateCurrent(HIGH_CURR) 
+        trainOR.updateCurrent(HIGH_CURR)
+        trainAND.updateCurrent(HIGH_CURR)
     else:
         #A = 0, B = 0
         trainA.updateCurrent(LOW_CURR)
         trainB.updateCurrent(LOW_CURR)
-        synLow.weight =  ON_TRAIN
-        synHigh.weight = OFF_TRAIN
-        trainHigh.updateCurrWithRate(case_rates[4])
-        trainLow.updateCurrWithRate(case_rates[4])
-    
+        trainNAND.updateCurrent(HIGH_CURR) 
+        trainOR.updateCurrent(LOW_CURR)
+        trainAND.updateCurrent(LOW_CURR)
     for i in range(ctr):
         print("LAYER1")
         for n in layer1:
@@ -342,23 +328,6 @@ def runNet(layer1, layer2, layer3, synLow, synHigh, trainA, trainB, trainLow, tr
         deleteTrain(layer1)
         deleteTrain(layer2)
         deleteTrain(layer3)
-    
-        #update training weights
-        if case == 1:
-            case_rates[1] = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
-            #print("CASE1_RATE: " + str(case_rates[1]))
-        elif case == 2:
-            case_rates[2] = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
-            #print("CASE3_RATE: " + str(case_rates[2]))
-        elif case == 3:
-            case_rates[3] = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
-            #print("CASE3_RATE: " + str(case_rates[3]))
-        elif case == 4:
-            case_rates[4] = max(layer3[0].avgRate,layer3[1].avgRate) * 0.7
-            #print("CASE3_RATE: " + str(case_rates[4]))
-        #print("TRAIN_WEIGHT: " + str(trainHigh.curr))
-
-    
         #update the training current
 
         #print("case " + str(case) + " low: " + str(layer3[0].avgRate) + " high: " + str(layer3[1].avgRate))
