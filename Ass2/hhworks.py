@@ -140,11 +140,6 @@ class Neuron:
         self.time += TIME_PER_NEURON
         print("avgRate: " + str(self.avgRate))
 
-    def forwardProp(self): #this is like updateNeuron but without updating
-        self.runEulers()
-        self.calculateAvgRate()
-        print("averageRate: " + str(self.avgRate))
-
 
     def performWeightedSum(self):
         totalCurrent = 0
@@ -176,7 +171,7 @@ class Synapse:
     def __init__(self, pre, post):
         self.pre = pre
         self.post = post
-        self.weight = 0.05
+        self.weight = random() / math.sqrt(32) 
 
 
 def fullyConnect(arr1, arr2):
@@ -273,13 +268,13 @@ def main():
     print("TRAINED:")
     #neural net time without training neurons!
     print("C1")
-    runNetStatic(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=1,ctr=1)
+    runNet(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=1,ctr=1)
     print("C2")
-    runNetStatic(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=2,ctr=1)
+    runNet(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=2,ctr=1)
     print("C3")
-    runNetStatic(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=3,ctr=1)
+    runNet(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=3,ctr=1)
     print("C4")
-    runNetStatic(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=4,ctr=1)
+    runNet(layer1, layer2, layer3, trainA,trainB,trainNAND,trainOR,trainAND,case=4,ctr=1)
 
 def runNet(layer1, layer2, layer3, trainA, trainB, trainNAND, trainOR, trainAND, case, ctr):
    #TODO maybe my input weights aren't different enough? experiment
@@ -336,59 +331,6 @@ def runNet(layer1, layer2, layer3, trainA, trainB, trainNAND, trainOR, trainAND,
         #update the training current
 
         #print("case " + str(case) + " low: " + str(layer3[0].avgRate) + " high: " + str(layer3[1].avgRate))
-
-def runNetStatic(layer1, layer2, layer3, trainA, trainB, trainNAND, trainOR, trainAND, case, ctr):
-   #TODO maybe my input weights aren't different enough? experiment
-
-    global case_rates
-    
-    if case == 1:
-        #A = 1, B = 1
-        trainA.updateCurrent(HIGH_CURR)
-        trainB.updateCurrent(HIGH_CURR)
-        trainNAND.updateCurrent(LOW_CURR) 
-        trainOR.updateCurrent(HIGH_CURR)
-        trainAND.updateCurrent(LOW_CURR)
-    elif case == 2:
-        #A = 1, B = 0
-        trainA.updateCurrent(HIGH_CURR)
-        trainB.updateCurrent(LOW_CURR)
-        trainNAND.updateCurrent(HIGH_CURR) 
-        trainOR.updateCurrent(HIGH_CURR)
-        trainAND.updateCurrent(HIGH_CURR)
-    elif case == 3:
-        #A = 0, B = 1
-        trainA.updateCurrent(LOW_CURR)
-        trainB.updateCurrent(HIGH_CURR)
-        trainNAND.updateCurrent(HIGH_CURR) 
-        trainOR.updateCurrent(HIGH_CURR)
-        trainAND.updateCurrent(HIGH_CURR)
-    else:
-        #A = 0, B = 0
-        trainA.updateCurrent(LOW_CURR)
-        trainB.updateCurrent(LOW_CURR)
-        trainNAND.updateCurrent(HIGH_CURR) 
-        trainOR.updateCurrent(LOW_CURR)
-        trainAND.updateCurrent(LOW_CURR)
-    for i in range(ctr):
-        print("LAYER1")
-        for n in layer1:
-            #print("layer1 neuron")
-            n.forwardProp()
-
-        print("LAYER2")
-        for n in layer2:
-            #print("layer2 neuron")
-            n.forwardProp()
-
-        print("LAYER3")
-        for n in layer3:
-            #print("layer3 neuron")
-            n.forwardProp()
-
-        deleteTrain(layer1)
-        deleteTrain(layer2)
-        deleteTrain(layer3)
 
 def deleteTrain(layer):
     for neu in layer:
